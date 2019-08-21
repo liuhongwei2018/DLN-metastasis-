@@ -1,0 +1,50 @@
+#
+library(caret)
+library(pROC)
+library(rms)
+data <- read.csv("DLN.csv")
+
+train_auc <- NULL
+test_auc <- NULL
+for (i in sample(10000000,10000)) {
+  set.seed(i)
+  train_index <- createDataPartition(data$DLN,p = 0.67,list = F)
+  train <- data[train_index,]
+  test <- data[-train_index,]
+  fit <- lrm(DLN ~ Gender + Central_neck_node_metastases + Age + Size + Extrathyroid_extension + Lymphovascular_invasion,data = train,x = T,y = T)
+  pred_train <- predict(fit,train[,-ncol(train)])
+  pred_test <- predict(fit,test[,-ncol(test)])
+  tmp_train <- auc(train$DLN,pred_train)
+  tmp_test <- auc(test$DLN,pred_test)
+  train_auc <- c(train_auc,tmp_train)
+  test_auc <- c(test_auc,tmp_test)
+}
+# obtain training and testing the mean and 95%CI of AUC 
+quantile(train_auc,0.025)
+quantile(train_auc,0.975)
+mean(train_auc)
+quantile(test_auc,0.025)
+quantile(test_auc,0.975)
+mean(test_auc)
+
+# extermal validation data 
+fit <- lrm(DLN ~ Gender + Central_neck_node_metastases + Age + Size + Extrathyroid_extension + Lymphovascular_invasion,data = data,x = T,y = T)
+validation_Data <- read.csv("DLN_validation.csv")
+val_pred <- predict(fit,validation_Data[,c(-1,-5,-8)],type = 'fitted')
+auc(validation_Data$DLN,val_pred)     
+
+#plot nomogram 
+DLN <- data$DLN
+Gender <- data$Gender
+Central_neck_node_metastases <- data$Central_neck_node_metastases
+Age <- data$Age
+Size <- data$Size
+Extrathyroid_extension <- data$Extrathyroid_extension
+Lymphovascular_invasion <- data$Lymphovascular_invasion
+ddist <- datadist(Gender,Central_neck_node_metastases,Age,Size,Extrathyroid_extension,Lymphovascular_invasion)
+options(datadist='ddist')
+nom <- nomogram(fit, fun=plogis,fun.at=c(0,.001, .01, .05, seq(.1,.9, by=.1), .95, .99, .999),
+                lp=F, funlabel="Risk")
+plot(nom)
+
+
