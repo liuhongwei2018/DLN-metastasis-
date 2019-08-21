@@ -1,0 +1,16 @@
+#draw a calibration plot in SAS
+
+proc logistic data=dln;
+class Gender (ref='0') Central_neck_node_metastases (ref='0') Extrathyroid_extension (ref='0') Lymphovascular_invasion (ref='0')/param=ref;
+model DLN (event='1')=Gender Age Size Central_neck_node_metastases Extrathyroid_extension Lymphovascular_invasion/rsquare lackfit outroc=troc;
+output out=LogiOut2 predicted=PredProb;
+run;
+proc sort data=LogiOut2; 
+by PredProb;  
+run;
+title "Calibration Plot for a Correct Model";
+proc sgplot data=LogiOut2 noautolegend aspect=1;
+   loess x=PredProb y=DLN / interpolation=cubic clm nomarkers;
+   lineparm x=0 y=0 slope=1 / lineattrs=(color=grey pattern=dash);
+   yaxis grid; xaxis grid;
+run;
