@@ -1,0 +1,16 @@
+# Logistic regression  by SAS 
+#
+#
+#
+# multivariable logistic regression development 
+proc logistic data=dln;
+class Gender (ref='0') Symmetry (ref='1') Multifocality (ref='0') Extrathyroid_extension (ref='0') Lymphovascular_invasion (ref='0') Central_neck_node_metastases (ref='0')/ param=ref;
+model DLN (event='1')=Gender Age Size Symmetry Multifocality Extrathyroid_extension Lymphovascular_invasion Central_neck_node_metastases/rsquare lackfit;
+run;
+
+
+
+# Assessing multicollinearity
+proc reg data=dln;
+model DLN =Gender Age Size Symmetry Multifocality Extrathyroid_extension Lymphovascular_invasion Central_neck_node_metastases/tol vif collin; 
+run;
