@@ -1,5 +1,6 @@
 # draw a forest plot using forestplot package in R. 
 library(forestplot)
+windowsFonts(font1 = windowsFont("Times New Roman"))
 
 label_name <- matrix(c("Risk factors","Gender","Age","Tumor size","Symmetry","Multifocality","Extrathyroid extension","Lymphovascular invasion","Central neck node metastases","OR(95%CI)","4.056(2.561-6.423)","0.972(0.953-0.991)","1.111(1.067-1.157)","1.404(0.874-2.257)","1.486(0.926-2.385)","2.204(1.228-3.955)","4.387(1.496-12.864)","4.502(2.469-8.210)","P value","<0.0001","0.0039","<0.0001","0.1608","0.1008","0.0081","0.0071","<0.0001"),byrow = F,nrow = 9)
 
